@@ -37,5 +37,25 @@
     "lint": "ray lint",
     "prepublishOnly": "echo \"\\n\\nIt seems like you are trying to publish the Raycast extension to npm.\\n\\nIf you did intend to publish it to npm, remove the \\`prepublishOnly\\` script and rerun \\`npm publish\\` again.\\nIf you wanted to publish it to the Raycast Store instead, use \\`npm run publish\\` instead.\\n\\n\" && exit 1",
     "publish": "npx @raycast/api@latest publish"
-  }
+  },
+  "preferences": [
+    {
+      "name": "host",
+      "type": "textfield",
+      "required": true,
+      "title": "API Host",
+      "description": "Enter the API host UR",
+      "placeholder": "https://duan.insv23.workers.dev",
+      "default": ""
+    },
+    {
+      "name": "token",
+      "type": "password",
+      "required": true,
+      "title": "API Token",
+      "description": "Enter your API token",
+      "placeholder": "Enter your duan API_TOKEN",
+      "default": ""
+    }
+  ]
 }
