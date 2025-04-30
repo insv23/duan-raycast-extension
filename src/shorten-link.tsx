@@ -5,6 +5,7 @@ import {
 	Form,
 	showToast,
 	Toast,
+	closeMainWindow,
 } from "@raycast/api";
 import { useEffect } from "react";
 import { useForm } from "@raycast/utils";
@@ -71,6 +72,9 @@ export default function Command() {
 				toast.style = Toast.Style.Success;
 				toast.title = "Link shortened successfully";
 				toast.message = `Copied to clipboard: ${response.short_url}`;
+
+				// 创建成功后关闭窗口
+				await closeMainWindow();
 			} catch (error) {
 				toast.style = Toast.Style.Failure;
 				toast.title = "Failed to create short link";
