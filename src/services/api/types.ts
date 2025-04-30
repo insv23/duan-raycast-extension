@@ -10,3 +10,9 @@ export interface CreateLinkResponse {
   short_url: string;
   original_url: string;
 }
+
+export interface UpdateLinkRequest {
+  url?: string;
+  is_enabled?: number;
+  description?: string | null;
+}
