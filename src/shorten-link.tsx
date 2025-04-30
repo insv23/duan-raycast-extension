@@ -23,6 +23,7 @@ export default function Command() {
 				const result = urlValidation.format(value);
 				if (!result.isValid) return result.message;
 			},
+			// TODO: 在 onChange 时调用验证器验证本地缓存 https://developers.raycast.com/api-reference/user-interface/form#validation
 			slug: (value) => {
 				const result = slugValidation.format(value);
 				if (!result.isValid) return result.message;
@@ -57,6 +58,7 @@ export default function Command() {
 
 	return (
 		<Form
+			enableDrafts
 			actions={
 				<ActionPanel>
 					<Action.SubmitForm
