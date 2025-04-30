@@ -1,6 +1,14 @@
-import { Action, ActionPanel, Clipboard, Form, showToast, Toast } from "@raycast/api";
+import {
+	Action,
+	ActionPanel,
+	Clipboard,
+	Form,
+	showToast,
+	Toast,
+} from "@raycast/api";
 import { useForm } from "@raycast/utils";
 import { createLink } from "./services/api";
+import { urlValidation, slugValidation } from "./services/validation";
 
 interface FormValues {
 	url: string;
@@ -12,16 +20,12 @@ export default function Command() {
 	const { handleSubmit, itemProps } = useForm<FormValues>({
 		validation: {
 			url: (value) => {
-				if (!value) return "URL is required";
-				if (!value.match(/^https?:\/\/.+/)) {
-					return "A valid URL starting with http:// or https:// is required";
-				}
+				const result = urlValidation.format(value);
+				if (!result.isValid) return result.message;
 			},
 			slug: (value) => {
-				if (!value) return "Slug is required";
-				if (!value.match(/^[a-zA-Z0-9-_]+$/)) {
-					return "Slug can only contain letters, numbers, hyphens and underscores";
-				}
+				const result = slugValidation.format(value);
+				if (!result.isValid) return result.message;
 			},
 		},
 		async onSubmit(values) {
@@ -45,7 +49,8 @@ export default function Command() {
 			} catch (error) {
 				toast.style = Toast.Style.Failure;
 				toast.title = "Failed to create short link";
-				toast.message = error instanceof Error ? error.message : "Unknown error occurred";
+				toast.message =
+					error instanceof Error ? error.message : "Unknown error occurred";
 			}
 		},
 	});

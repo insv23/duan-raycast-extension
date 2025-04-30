@@ -14,3 +14,7 @@ export const createLink = async (
     body: data,
   });
 };
+
+export const getLink = async (shortcode: string): Promise<Link> => {
+  return fetchWithAuth<Link>(`/api/links/${shortcode}`, { method: "GET" });
+};
