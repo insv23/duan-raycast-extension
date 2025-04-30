@@ -4,8 +4,8 @@ import {
 	Clipboard,
 	Form,
 	showToast,
+	showHUD,
 	Toast,
-	closeMainWindow,
 } from "@raycast/api";
 import { useEffect } from "react";
 import { useForm } from "@raycast/utils";
@@ -23,20 +23,22 @@ export default function Command() {
 	// 在 Shorten Link 命令加载时获取并缓存所有已使用的 slugs
 	useEffect(() => {
 		const initializeSlugCache = async () => {
+			const toast = await showToast({
+				style: Toast.Style.Animated,
+				title: "Initializing slug cache...",
+			});
+
 			try {
 				const slugs = await getShortcodes();
 				setUsedSlugs(slugs);
-				await showToast({
-					style: Toast.Style.Success,
-					title: "Slug cache initialized",
-				});
+
+				toast.style = Toast.Style.Success;
+				toast.title = "Slug cache initialized";
 			} catch (error) {
-				await showToast({
-					style: Toast.Style.Failure,
-					title: "Failed to initialize slug cache",
-					message:
-						error instanceof Error ? error.message : "Unknown error occurred",
-				});
+				toast.style = Toast.Style.Failure;
+				toast.title = "Failed to initialize slug cache";
+				toast.message =
+					error instanceof Error ? error.message : "Unknown error occurred";
 			}
 		};
 
@@ -69,12 +71,8 @@ export default function Command() {
 
 				await Clipboard.copy(response.short_url);
 
-				toast.style = Toast.Style.Success;
-				toast.title = "Link shortened successfully";
-				toast.message = `Copied to clipboard: ${response.short_url}`;
-
-				// 创建成功后关闭窗口
-				await closeMainWindow();
+				// 使用 HUD 替代 Toast，因为 Clipboard.copy 操作会关闭窗口
+				await showHUD(`Copied ${response.short_url}`);
 			} catch (error) {
 				toast.style = Toast.Style.Failure;
 				toast.title = "Failed to create short link";
