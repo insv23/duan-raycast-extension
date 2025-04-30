@@ -6,9 +6,11 @@ import {
 	showToast,
 	Toast,
 } from "@raycast/api";
+import { useEffect } from "react";
 import { useForm } from "@raycast/utils";
-import { createLink } from "./services/api";
+import { createLink, getShortcodes } from "./services/api";
 import { urlValidation, slugValidation } from "./services/validation";
+import { setUsedSlugs } from "./services/validation/slug/cache";
 
 interface FormValues {
 	url: string;
@@ -17,13 +19,35 @@ interface FormValues {
 }
 
 export default function Command() {
+	// 在 Shorten Link 命令加载时获取并缓存所有已使用的 slugs
+	useEffect(() => {
+		const initializeSlugCache = async () => {
+			try {
+				const slugs = await getShortcodes();
+				setUsedSlugs(slugs);
+				await showToast({
+					style: Toast.Style.Success,
+					title: "Slug cache initialized",
+				});
+			} catch (error) {
+				await showToast({
+					style: Toast.Style.Failure,
+					title: "Failed to initialize slug cache",
+					message:
+						error instanceof Error ? error.message : "Unknown error occurred",
+				});
+			}
+		};
+
+		initializeSlugCache();
+	}, []);
+
 	const { handleSubmit, itemProps } = useForm<FormValues>({
 		validation: {
 			url: (value) => {
 				const result = urlValidation.format(value);
 				if (!result.isValid) return result.message;
 			},
-			// TODO: 在 onChange 时调用验证器验证本地缓存 https://developers.raycast.com/api-reference/user-interface/form#validation
 			slug: (value) => {
 				const result = slugValidation.format(value);
 				if (!result.isValid) return result.message;

@@ -1,5 +1,6 @@
 import { getLink } from "../../api";
 import type { ValidationResult, SlugValidationRules } from "./types";
+import { isSlugUsed } from "./cache";
 
 /**
  * 函数签名：
@@ -33,43 +34,19 @@ export const validateSlugFormat = (
 		};
 	}
 
-	return { isValid: true };
-};
-
-export const validateSlugAvailability = async (
-	// FIXME:  Raycast  useForm 的验证器不支持异步验证，实现缓存后在本地验证
-	value: string,
-): Promise<ValidationResult> => {
-	try {
-		await getLink(value);
+	// 添加缓存验证
+	// 1. 在 shorten-link 命令加载时获取 slugs 并更新到 Cache
+	// 2. 在表单验证时同步地从 Cache 读取进行验证(因为 Raycast 的表单验证不支持异步)
+	if (isSlugUsed(value)) {
 		return {
 			isValid: false,
 			message: "This slug is already taken. Please choose another one.",
 		};
-	} catch (error) {
-		return { isValid: true };
-	}
-};
-
-export const validateSlug = async (
-	value: string | undefined,
-): Promise<ValidationResult> => {
-	if (!isNonEmptyString(value)) {
-		return {
-			isValid: false,
-			message: "Slug is required",
-		};
 	}
 
-	const formatResult = validateSlugFormat(value);
-	if (!formatResult.isValid) {
-		return formatResult;
-	}
-
-	return await validateSlugAvailability(value);
+	return { isValid: true };
 };
 
 export const slugValidation: SlugValidationRules = {
 	format: validateSlugFormat,
-	availability: validateSlugAvailability,
 };
