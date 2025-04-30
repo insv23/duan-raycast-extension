@@ -9,6 +9,8 @@ src/
 ├── components/
 │   ├── LinkDetail.tsx     # 链接详情视图组件
 │   └── LinkItem.tsx       # 链接列表项组件
+├── hooks/
+│   └── useLinks.ts       # 链接列表获取和缓存 hook
 ├── services/
 │   ├── api/
 │   │   ├── endpoints/
@@ -25,7 +27,8 @@ src/
 │       └── url/
 │           ├── index.ts   # URL 验证逻辑
 │           └── types.ts   # URL 验证类型
-└── shorten-link.tsx      # 命令实现
+├── list-links.tsx        # 列出短链接命令
+└── shorten-link.tsx      # 创建短链接命令
 ```
 
 ## 缓存机制

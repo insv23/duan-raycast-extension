@@ -9,6 +9,8 @@ src/
 ├── components/
 │   ├── LinkDetail.tsx     # Link detail view component
 │   └── LinkItem.tsx       # Link list item component
+├── hooks/
+│   └── useLinks.ts       # Links list fetching and caching hook
 ├── services/
 │   ├── api/
 │   │   ├── endpoints/
@@ -25,7 +27,8 @@ src/
 │       └── url/
 │           ├── index.ts   # URL validation logic
 │           └── types.ts   # URL validation types
-└── shorten-link.tsx      # Command implementation
+├── list-links.tsx        # List links command
+└── shorten-link.tsx      # Shorten link command
 ```
 
 ## Caching Mechanisms
