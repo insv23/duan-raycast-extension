@@ -5,6 +5,7 @@ import {
 	Form,
 	showToast,
 	Toast,
+	useNavigation,
 } from "@raycast/api";
 import { useForm } from "@raycast/utils";
 import type { Link } from "../types";
@@ -23,16 +24,15 @@ interface FormValues {
 }
 
 export const LinkDetail = ({ link, onRefresh }: LinkDetailProps) => {
+	const { pop } = useNavigation();
 	const { handleSubmit, itemProps } = useForm<FormValues>({
 		validation: {
-			// TODO: 在 onChange 时调用验证器
 			url: (value) => {
 				const result = urlValidation.format(value);
 				if (!result.isValid) return result.message;
 			},
 		},
 		async onSubmit(values) {
-			// TODO: 更新完成后，应该刷新本地缓存
 			const toast = await showToast({
 				style: Toast.Style.Animated,
 				title: "Updating link...",
@@ -48,7 +48,8 @@ export const LinkDetail = ({ link, onRefresh }: LinkDetailProps) => {
 				toast.style = Toast.Style.Success;
 				toast.title = "Link updated successfully";
 
-				onRefresh();
+				onRefresh(); // 更新后重新获取 links list
+				pop(); // 更新成功后返回上一级
 			} catch (error) {
 				toast.style = Toast.Style.Failure;
 				toast.title = "Failed to update link";

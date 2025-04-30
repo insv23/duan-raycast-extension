@@ -1,5 +1,11 @@
-import { List, ActionPanel, Action, Icon } from "@raycast/api";
-import { getFavicon } from "@raycast/utils";
+import {
+	List,
+	ActionPanel,
+	Action,
+	Icon,
+	confirmAlert,
+	Alert,
+} from "@raycast/api";
 import { getPreferenceValues } from "@raycast/api";
 import type { Link } from "../types";
 import type { Preferences } from "../types";
@@ -8,15 +14,31 @@ import { deleteLink } from "../services/api";
 
 interface LinkItemProps {
 	link: Link;
+	onRefresh: () => void;
 }
 
-export const LinkItem = ({ link }: LinkItemProps) => {
+export const LinkItem = ({ link, onRefresh }: LinkItemProps) => {
 	const BASE_URL = getPreferenceValues<Preferences>().host;
 	const shortUrl = `${BASE_URL}/${link.short_code}`;
 
 	const handleDelete = async () => {
-		await deleteLink(link.short_code);
-		// TODO: 刷新
+		if (
+			await confirmAlert({
+				title: "Delete Link",
+				message: `Are you sure you want to delete ${link.short_code}?`,
+				primaryAction: {
+					title: "Delete",
+					style: Alert.ActionStyle.Destructive,
+				},
+				dismissAction: {
+					title: "Cancel",
+					style: Alert.ActionStyle.Cancel,
+				},
+			})
+		) {
+			await deleteLink(link.short_code);
+			onRefresh(); // 删除后重新获取列表
+		}
 	};
 
 	return (
@@ -43,12 +65,13 @@ export const LinkItem = ({ link }: LinkItemProps) => {
 					<Action.Push
 						icon={Icon.Paragraph}
 						title="Edit"
-						target={<LinkDetail link={link} onRefresh={() => {}} />} // TODO: 刷新
+						target={<LinkDetail link={link} onRefresh={onRefresh} />}
 					/>
 					<Action
 						icon={Icon.Trash}
 						title="Delete Link"
-						onAction={handleDelete} // 删除使用 confirmAlert
+						style={Action.Style.Destructive}
+						onAction={handleDelete}
 					/>
 				</ActionPanel>
 			}
