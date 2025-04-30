@@ -1,11 +1,11 @@
 import {
 	Action,
 	ActionPanel,
-	Clipboard,
 	Form,
 	showToast,
-	showHUD,
 	Toast,
+	launchCommand,
+	LaunchType,
 } from "@raycast/api";
 import { useEffect } from "react";
 import { useForm } from "@raycast/utils";
@@ -69,10 +69,14 @@ export default function Command() {
 					description: values.description || null,
 				});
 
-				await Clipboard.copy(response.short_url);
-
-				// 使用 HUD 替代 Toast，因为 Clipboard.copy 操作会关闭窗口
-				await showHUD(`Copied ${response.short_url}`);
+				// 启动 list-links 命令
+				await launchCommand({
+					name: "list-links",
+					type: LaunchType.UserInitiated,
+					context: {
+						searchText: response.short_code
+					}
+				});
 			} catch (error) {
 				toast.style = Toast.Style.Failure;
 				toast.title = "Failed to create short link";

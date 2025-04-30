@@ -4,17 +4,24 @@ import { useLinks } from "./hooks/useLinks";
 import { LinkItem } from "./components/LinkItem";
 import { searchLinks } from "./services/search";
 
-export default function Command() {
-	const { data: links, isLoading, revalidate } = useLinks();
-	const [searchText, setSearchText] = useState("");
+interface LaunchProps {
+	launchContext?: {
+		searchText?: string;
+	};
+}
 
-	const filteredLinks = searchLinks(links, searchText);
+export default function Command(props: LaunchProps) {
+	const { data: links, isLoading, revalidate } = useLinks();
+	const [keyword, setKeyword] = useState(props.launchContext?.searchText || "");
+
+	const filteredLinks = searchLinks(links, keyword);
 
 	return (
 		<List
 			searchBarPlaceholder="Search by Slug, URL or Description"
 			isLoading={isLoading}
-			onSearchTextChange={setSearchText}
+			onSearchTextChange={setKeyword}
+			searchText={keyword}
 			filtering={false} // Disable Raycast's built-in filtering
 			throttle // Optimize performance with throttling
 		>
