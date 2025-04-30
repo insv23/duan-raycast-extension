@@ -2,33 +2,62 @@
 
 基于 Cloudflare Workers 和 D1 数据库的 URL 短链接服务
 
+## 功能特性
+
+- 创建和管理短链接
+- 启用/禁用链接
+- 添加链接描述
+- 高级搜索功能
+  - 多字段搜索（短码、URL、描述）
+  - 支持部分匹配
+  - 大小写不敏感
+  - 支持中文搜索
+
 ## 项目结构
 
 ```
-src/
-├── components/
-│   ├── LinkDetail.tsx     # 链接详情视图组件
-│   └── LinkItem.tsx       # 链接列表项组件
-├── hooks/
-│   └── useLinks.ts       # 链接列表获取和缓存 hook
-├── services/
-│   ├── api/
-│   │   ├── endpoints/
-│   │   │   └── links.ts   # 链接相关的 API 端点
-│   │   ├── client.ts      # HTTP 客户端实现
-│   │   ├── config.ts      # API 配置
-│   │   ├── types.ts       # API 类型定义
-│   │   └── index.ts       # API 导出
-│   └── validation/
-│       ├── slug/
-│       │   ├── cache.ts   # Slug 缓存实现
-│       │   ├── index.ts   # Slug 验证逻辑
-│       │   └── types.ts   # Slug 验证类型
-│       └── url/
-│           ├── index.ts   # URL 验证逻辑
-│           └── types.ts   # URL 验证类型
-├── list-links.tsx        # 列出短链接命令
-└── shorten-link.tsx      # 创建短链接命令
+.
+├── README.md
+├── README.zh-CN.md
+├── package.json
+├── src/
+│   ├── components/
+│   │   ├── LinkDetail.tsx    # 链接编辑表单
+│   │   └── LinkItem.tsx      # 列表项组件
+│   ├── hooks/
+│   │   └── useLinks.ts       # 数据获取 hook
+│   ├── services/
+│   │   ├── api.ts           # API 客户端
+│   │   ├── search.ts        # 搜索工具
+│   │   └── validation.ts    # 表单验证
+│   ├── types/
+│   │   └── index.ts         # TypeScript 类型定义
+│   ├── create-link.tsx      # 创建链接命令
+│   └── list-links.tsx       # 列表链接命令
+```
+
+## 搜索功能
+
+扩展提供了强大的搜索功能，用户可以通过以下字段查找链接：
+- 短码
+- 原始 URL
+- 描述
+
+搜索实现支持：
+- 部分匹配（例如，搜索 "git" 会匹配 "github.com"）
+- 大小写不敏感
+- 中文搜索
+- 多字段搜索（匹配任意字段）
+
+示例：
+```typescript
+// 跨所有字段搜索
+const results = searchLinks(links, "github");
+
+// 将匹配：
+// - 短码: "gh-repo"
+// - URL: "https://github.com/..."
+// - 描述: "我的 GitHub 仓库"
 ```
 
 ## 缓存机制

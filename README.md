@@ -1,34 +1,63 @@
 # duan (Raycast Extension)
 
-URL shortener powered by Cloudflare Workers and D1 Database
+URL shortener service based on Cloudflare Workers and D1 database.
+
+## Features
+
+- Create and manage short links
+- Enable/disable links
+- Add descriptions to links
+- Advanced search capabilities
+  - Search across multiple fields (short code, URL, description)
+  - Support partial matching
+  - Case-insensitive search
+  - Chinese character support
 
 ## Project Structure
 
 ```
-src/
-├── components/
-│   ├── LinkDetail.tsx     # Link detail view component
-│   └── LinkItem.tsx       # Link list item component
-├── hooks/
-│   └── useLinks.ts       # Links list fetching and caching hook
-├── services/
-│   ├── api/
-│   │   ├── endpoints/
-│   │   │   └── links.ts   # Link-related API endpoints
-│   │   ├── client.ts      # HTTP client implementation
-│   │   ├── config.ts      # API configuration
-│   │   ├── types.ts       # API type definitions
-│   │   └── index.ts       # API exports
-│   └── validation/
-│       ├── slug/
-│       │   ├── cache.ts   # Slug cache implementation
-│       │   ├── index.ts   # Slug validation logic
-│       │   └── types.ts   # Slug validation types
-│       └── url/
-│           ├── index.ts   # URL validation logic
-│           └── types.ts   # URL validation types
-├── list-links.tsx        # List links command
-└── shorten-link.tsx      # Shorten link command
+.
+├── README.md
+├── README.zh-CN.md
+├── package.json
+├── src/
+│   ├── components/
+│   │   ├── LinkDetail.tsx    # Link edit form
+│   │   └── LinkItem.tsx      # List item component
+│   ├── hooks/
+│   │   └── useLinks.ts       # Data fetching hook
+│   ├── services/
+│   │   ├── api.ts           # API client
+│   │   ├── search.ts        # Search utilities
+│   │   └── validation.ts    # Form validation
+│   ├── types/
+│   │   └── index.ts         # TypeScript definitions
+│   ├── create-link.tsx      # Create link command
+│   └── list-links.tsx       # List links command
+```
+
+## Search Functionality
+
+The extension provides a powerful search feature that allows users to find links by:
+- Short code
+- Original URL
+- Description
+
+Search implementation supports:
+- Partial matching (e.g., searching "git" will match "github.com")
+- Case-insensitive search
+- Chinese character search
+- Multiple field search (matches any of the fields)
+
+Example:
+```typescript
+// Search across all fields
+const results = searchLinks(links, "github");
+
+// Will match:
+// - Short code: "gh-repo"
+// - URL: "https://github.com/..."
+// - Description: "My GitHub repository"
 ```
 
 ## Caching Mechanisms
