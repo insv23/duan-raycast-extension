@@ -1,4 +1,4 @@
-import { Action, ActionPanel, Form, showToast, Toast } from "@raycast/api";
+import { Action, ActionPanel, Clipboard, Form, showToast, Toast } from "@raycast/api";
 import { useForm } from "@raycast/utils";
 import { createLink } from "./services/api";
 
@@ -37,14 +37,15 @@ export default function Command() {
 					description: values.description || null,
 				});
 
+				await Clipboard.copy(response.short_url);
+
 				toast.style = Toast.Style.Success;
 				toast.title = "Link shortened successfully";
-				toast.message = response.short_url;
+				toast.message = `Copied to clipboard: ${response.short_url}`;
 			} catch (error) {
 				toast.style = Toast.Style.Failure;
 				toast.title = "Failed to create short link";
-				toast.message =
-					error instanceof Error ? error.message : "Unknown error occurred";
+				toast.message = error instanceof Error ? error.message : "Unknown error occurred";
 			}
 		},
 	});
