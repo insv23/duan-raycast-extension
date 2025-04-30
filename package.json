@@ -44,8 +44,8 @@
       "type": "textfield",
       "required": true,
       "title": "API Host",
-      "description": "Enter the API host UR",
-      "placeholder": "https://duan.insv23.workers.dev",
+      "description": "Enter the API host URL",
+      "placeholder": "https://your-domain.com (*.workers.dev have TLS issue)",
       "default": ""
     },
     {
