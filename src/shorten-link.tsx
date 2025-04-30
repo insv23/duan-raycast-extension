@@ -6,12 +6,14 @@ import {
 	Toast,
 	launchCommand,
 	LaunchType,
+	Icon,
 } from "@raycast/api";
 import { useEffect } from "react";
 import { useForm } from "@raycast/utils";
 import { createLink, getShortcodes } from "./services/api";
 import { urlValidation, slugValidation } from "./services/validation";
 import { setUsedSlugs } from "./services/validation/slug/cache";
+import { generateRandomSlug } from "./utils/random";
 
 interface FormValues {
 	url: string;
@@ -45,7 +47,7 @@ export default function Command() {
 		initializeSlugCache();
 	}, []);
 
-	const { handleSubmit, itemProps } = useForm<FormValues>({
+	const { handleSubmit, itemProps, setValue } = useForm<FormValues>({
 		validation: {
 			url: (value) => {
 				const result = urlValidation.format(value);
@@ -74,8 +76,8 @@ export default function Command() {
 					name: "list-links",
 					type: LaunchType.UserInitiated,
 					context: {
-						searchText: response.short_code
-					}
+						searchText: response.short_code,
+					},
 				});
 			} catch (error) {
 				toast.style = Toast.Style.Failure;
@@ -95,6 +97,12 @@ export default function Command() {
 						title="Create Short Link"
 						onSubmit={handleSubmit}
 					/>
+					<Action
+						title="Generate Random Slug"
+						icon={Icon.Wand}
+						onAction={() => setValue("slug", generateRandomSlug())}
+						shortcut={{ modifiers: ["cmd"], key: "g" }}
+					/>
 				</ActionPanel>
 			}
 		>
@@ -107,7 +115,8 @@ export default function Command() {
 			<Form.TextField
 				{...itemProps.slug}
 				title="Slug"
-				placeholder="custom-slug"
+				placeholder="custom-slug or Cmd+G to generate random slug"
+				info="Cmd+G to generate random slug"
 			/>
 			<Form.TextField
 				{...itemProps.description}

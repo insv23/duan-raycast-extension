@@ -63,6 +63,24 @@
       "description": "Enter your API token",
       "placeholder": "Enter your duan API_TOKEN",
       "default": ""
+    },
+    {
+      "name": "slugChars",
+      "type": "textfield",
+      "required": false,
+      "title": "Slug Characters",
+      "description": "Characters to use when generating random slugs",
+      "placeholder": "Enter characters to use for slug generation",
+      "default": "abcdefghijkmnpqrstuvwxy23456789"
+    },
+    {
+      "name": "slugLength",
+      "type": "textfield",
+      "required": false,
+      "title": "Slug Length",
+      "description": "Length of generated random slugs",
+      "placeholder": "Enter a number",
+      "default": "4"
     }
   ]
 }

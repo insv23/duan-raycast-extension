@@ -1,6 +1,8 @@
 export interface Preferences {
 	host: string;
 	token: string;
+	slugChars: string;
+	slugLength: string;
 }
 
 export interface Link {
