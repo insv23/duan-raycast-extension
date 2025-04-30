@@ -1,40 +1,81 @@
-import { Form, ActionPanel, Action, showToast } from "@raycast/api";
+import { Action, ActionPanel, Form, showToast, Toast } from "@raycast/api";
+import { useForm } from "@raycast/utils";
+import { createLink } from "./services/api";
 
-type Values = {
-  textfield: string;
-  textarea: string;
-  datepicker: Date;
-  checkbox: boolean;
-  dropdown: string;
-  tokeneditor: string[];
-};
+interface FormValues {
+	url: string;
+	slug: string;
+	description?: string;
+}
 
 export default function Command() {
-  function handleSubmit(values: Values) {
-    console.log(values);
-    showToast({ title: "Submitted form", message: "See logs for submitted values" });
-  }
+	const { handleSubmit, itemProps } = useForm<FormValues>({
+		validation: {
+			url: (value) => {
+				if (!value) return "URL is required";
+				if (!value.match(/^https?:\/\/.+/)) {
+					return "A valid URL starting with http:// or https:// is required";
+				}
+			},
+			slug: (value) => {
+				if (!value) return "Slug is required";
+				if (!value.match(/^[a-zA-Z0-9-_]+$/)) {
+					return "Slug can only contain letters, numbers, hyphens and underscores";
+				}
+			},
+		},
+		async onSubmit(values) {
+			const toast = await showToast({
+				style: Toast.Style.Animated,
+				title: "Creating short link...",
+			});
 
-  return (
-    <Form
-      actions={
-        <ActionPanel>
-          <Action.SubmitForm onSubmit={handleSubmit} />
-        </ActionPanel>
-      }
-    >
-      <Form.Description text="This form showcases all available form elements." />
-      <Form.TextField id="textfield" title="Text field" placeholder="Enter text" defaultValue="Raycast" />
-      <Form.TextArea id="textarea" title="Text area" placeholder="Enter multi-line text" />
-      <Form.Separator />
-      <Form.DatePicker id="datepicker" title="Date picker" />
-      <Form.Checkbox id="checkbox" title="Checkbox" label="Checkbox Label" storeValue />
-      <Form.Dropdown id="dropdown" title="Dropdown">
-        <Form.Dropdown.Item value="dropdown-item" title="Dropdown Item" />
-      </Form.Dropdown>
-      <Form.TagPicker id="tokeneditor" title="Tag picker">
-        <Form.TagPicker.Item value="tagpicker-item" title="Tag Picker Item" />
-      </Form.TagPicker>
-    </Form>
-  );
+			try {
+				const response = await createLink({
+					url: values.url,
+					short_code: values.slug,
+					description: values.description || null,
+				});
+
+				toast.style = Toast.Style.Success;
+				toast.title = "Link shortened successfully";
+				toast.message = response.short_url;
+			} catch (error) {
+				toast.style = Toast.Style.Failure;
+				toast.title = "Failed to create short link";
+				toast.message =
+					error instanceof Error ? error.message : "Unknown error occurred";
+			}
+		},
+	});
+
+	return (
+		<Form
+			actions={
+				<ActionPanel>
+					<Action.SubmitForm
+						title="Create Short Link"
+						onSubmit={handleSubmit}
+					/>
+				</ActionPanel>
+			}
+		>
+			<Form.TextField
+				{...itemProps.url}
+				title="URL"
+				placeholder="https://a-very-long-url.com"
+				autoFocus
+			/>
+			<Form.TextField
+				{...itemProps.slug}
+				title="Slug"
+				placeholder="custom-slug"
+			/>
+			<Form.TextField
+				{...itemProps.description}
+				title="Description"
+				placeholder="Optional description for this link"
+			/>
+		</Form>
+	);
 }
