@@ -5,6 +5,7 @@ import {
 	Icon,
 	confirmAlert,
 	Alert,
+	Keyboard,
 } from "@raycast/api";
 import { getPreferenceValues } from "@raycast/api";
 import type { Link } from "../types";
@@ -71,6 +72,7 @@ export const LinkItem = ({ link, onRefresh }: LinkItemProps) => {
 						icon={Icon.Trash}
 						title="Delete Link"
 						style={Action.Style.Destructive}
+						shortcut={Keyboard.Shortcut.Common.Remove}
 						onAction={handleDelete}
 					/>
 				</ActionPanel>
