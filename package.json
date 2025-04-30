@@ -16,6 +16,13 @@
       "subtitle": "Shorten link with your own domain.",
       "description": "Create a new short link",
       "mode": "view"
+    },
+    {
+      "name": "list-links",
+      "title": "List Links",
+      "subtitle": "View and manage your shortened links.",
+      "description": "List all your shortened links",
+      "mode": "view"
     }
   ],
   "dependencies": {
