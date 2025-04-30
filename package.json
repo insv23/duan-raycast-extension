@@ -52,7 +52,7 @@
       "required": true,
       "title": "API Host",
       "description": "Enter the API host URL",
-      "placeholder": "https://your-domain.com (*.workers.dev have TLS issue)",
+      "placeholder": "https://your-domain.com (*.workers.dev not works)",
       "default": ""
     },
     {
