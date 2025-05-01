@@ -2,6 +2,13 @@
 
 URL shortener service based on Cloudflare Workers and D1 database.
 
+<p align="center">
+  <img src="https://img.shields.io/badge/cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare Workers">
+  <img src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/D1%20Database-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare D1">
+  <img src="https://img.shields.io/badge/Raycast-Extension-blue.svg?style=for-the-badge&logo=raycast&logoColor=white" alt="Raycast Extension">
+</p>
+
 ## Features
 
 - Create and manage short links
@@ -13,7 +20,19 @@ URL shortener service based on Cloudflare Workers and D1 database.
   - Case-insensitive search
   - Chinese character support
 
-## Project Structure
+## How to use?
+
+1. [Deploy your own duan API service](https://github.com/insv23/duan/tree/main?tab=readme-ov-file#installation) on Cloudflare Workers.
+
+2. Install the Raycast extension from the Raycast Extension Store.
+
+3. Configure the extension with your API host and token.
+
+4. Start using the extension to shorten and manage your links.
+
+## Development
+
+### Project Structure
 
 ```
 .
@@ -27,16 +46,32 @@ URL shortener service based on Cloudflare Workers and D1 database.
 │   ├── hooks/
 │   │   └── useLinks.ts       # Data fetching hook
 │   ├── services/
-│   │   ├── api.ts           # API client
-│   │   ├── search.ts        # Search utilities
-│   │   └── validation.ts    # Form validation
+│   │   ├── api/
+│   │   │   ├── client.ts     # API client implementation
+│   │   │   ├── config.ts     # API configuration
+│   │   │   ├── endpoints/
+│   │   │   │   ├── links.ts  # Links API endpoints
+│   │   │   │   └── slugs.ts  # Slugs API endpoints
+│   │   │   └── index.ts      # API exports
+│   │   ├── search.ts         # Search utilities
+│   │   └── validation/
+│   │       ├── slug/
+│   │       │   ├── cache.ts  # Slug cache management
+│   │       │   ├── index.ts  # Slug validation logic
+│   │       │   └── types.ts  # Slug validation types
+│   │       ├── url/
+│   │       │   ├── index.ts  # URL validation logic
+│   │       │   └── types.ts  # URL validation types
+│   │       └── index.ts      # Validation exports
 │   ├── types/
-│   │   └── index.ts         # TypeScript definitions
-│   ├── create-link.tsx      # Create link command
-│   └── list-links.tsx       # List links command
+│   │   └── index.ts          # TypeScript definitions
+│   ├── utils/
+│   │   └── random.ts         # Random slug generation
+│   ├── list-links.tsx        # List links command
+│   └── shorten-link.tsx      # Create link command
 ```
 
-## Search Functionality
+### Search Functionality
 
 The extension provides a powerful search feature that allows users to find links by:
 - Short code
@@ -60,11 +95,11 @@ const results = searchLinks(links, "github");
 // - Description: "My GitHub repository"
 ```
 
-## Caching Mechanisms
+### Caching Mechanisms
 
 Raycast provides three different caching mechanisms, each suited for specific use cases:
 
-### Cache (Low-level API)
+#### Cache (Low-level API)
 - **Characteristics:**
   - Basic key-value storage
   - Synchronous operations
@@ -76,7 +111,7 @@ Raycast provides three different caching mechanisms, each suited for specific us
   - Custom cache strategy implementation
   - Form validation caching
 
-### useCachedState (React Hook)
+#### useCachedState (React Hook)
 - **Characteristics:**
   - Similar to useState but persisted
   - Suitable for UI state storage
@@ -87,7 +122,7 @@ Raycast provides three different caching mechanisms, each suited for specific us
   - Storing user preferences
   - UI configuration persistence
 
-### useCachedPromise (React Hook)
+#### useCachedPromise (React Hook)
 - **Characteristics:**
   - Implements stale-while-revalidate strategy
   - Automatic loading state handling
@@ -99,11 +134,11 @@ Raycast provides three different caching mechanisms, each suited for specific us
   - Optimizing data loading experience
   - List data caching
 
-### Implementation Examples
+#### Implementation Examples
 
 To demonstrate how to choose the appropriate caching mechanism, here are two concrete examples from our project:
 
-#### Links List Caching
+##### Links List Caching
 - **Use Case:** Caching the list of all shortened links
 - **Chosen Solution:** `useCachedPromise`
 - **Rationale:**
@@ -113,7 +148,7 @@ To demonstrate how to choose the appropriate caching mechanism, here are two con
   - Benefits from stale-while-revalidate strategy
   - Data should stay fresh while allowing immediate display of cached content
 
-#### Slug Availability Validation
+##### Slug Availability Validation
 - **Use Case:** Caching results of slug availability checks
 - **Chosen Solution:** `Cache` (low-level API)
 - **Implementation Details:**

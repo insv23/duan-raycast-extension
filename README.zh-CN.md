@@ -2,6 +2,13 @@
 
 基于 Cloudflare Workers 和 D1 数据库的 URL 短链接服务
 
+<p align="center">
+  <img src="https://img.shields.io/badge/cloudflare-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare Workers">
+  <img src="https://img.shields.io/badge/typescript-%23007ACC.svg?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript">
+  <img src="https://img.shields.io/badge/D1%20Database-F38020?style=for-the-badge&logo=cloudflare&logoColor=white" alt="Cloudflare D1">
+  <img src="https://img.shields.io/badge/Raycast-Extension-blue.svg?style=for-the-badge&logo=raycast&logoColor=white" alt="Raycast Extension">
+</p>
+
 ## 功能特性
 
 - 创建和管理短链接
@@ -13,7 +20,19 @@
   - 大小写不敏感
   - 支持中文搜索
 
-## 项目结构
+## 如何使用？
+
+1. 在 Cloudflare Workers 上[部署你自己的 duan API 服务](https://github.com/insv23/duan/tree/main?tab=readme-ov-file#installation)。
+
+2. 从 Raycast 扩展商店安装此扩展。
+
+3. 使用你的 API 主机和令牌配置扩展。
+
+4. 开始使用扩展来缩短和管理你的链接。
+
+## 开发
+
+### 项目结构
 
 ```
 .
@@ -27,16 +46,32 @@
 │   ├── hooks/
 │   │   └── useLinks.ts       # 数据获取 hook
 │   ├── services/
-│   │   ├── api.ts           # API 客户端
-│   │   ├── search.ts        # 搜索工具
-│   │   └── validation.ts    # 表单验证
+│   │   ├── api/
+│   │   │   ├── client.ts     # API 客户端实现
+│   │   │   ├── config.ts     # API 配置
+│   │   │   ├── endpoints/
+│   │   │   │   ├── links.ts  # 链接 API 端点
+│   │   │   │   └── slugs.ts  # 短码 API 端点
+│   │   │   └── index.ts      # API 导出
+│   │   ├── search.ts         # 搜索工具
+│   │   └── validation/
+│   │       ├── slug/
+│   │       │   ├── cache.ts  # 短码缓存管理
+│   │       │   ├── index.ts  # 短码验证逻辑
+│   │       │   └── types.ts  # 短码验证类型
+│   │       ├── url/
+│   │       │   ├── index.ts  # URL 验证逻辑
+│   │       │   └── types.ts  # URL 验证类型
+│   │       └── index.ts      # 验证导出
 │   ├── types/
-│   │   └── index.ts         # TypeScript 类型定义
-│   ├── create-link.tsx      # 创建链接命令
-│   └── list-links.tsx       # 列表链接命令
+│   │   └── index.ts          # TypeScript 类型定义
+│   ├── utils/
+│   │   └── random.ts         # 随机短码生成
+│   ├── list-links.tsx        # 列表链接命令
+│   └── shorten-link.tsx      # 创建链接命令
 ```
 
-## 搜索功能
+### 搜索功能
 
 扩展提供了强大的搜索功能，用户可以通过以下字段查找链接：
 - 短码
@@ -60,11 +95,11 @@ const results = searchLinks(links, "github");
 // - 描述: "我的 GitHub 仓库"
 ```
 
-## 缓存机制
+### 缓存机制
 
 Raycast 提供了三种不同的缓存机制，每种都适用于特定场景：
 
-### Cache (底层 API)
+#### Cache (底层 API)
 - **特点：**
   - 基础的键值存储
   - 同步操作
@@ -76,7 +111,7 @@ Raycast 提供了三种不同的缓存机制，每种都适用于特定场景：
   - 实现自定义缓存策略
   - 表单验证缓存
 
-### useCachedState (React Hook)
+#### useCachedState (React Hook)
 - **特点：**
   - 类似 useState 但会持久化
   - 适合存储 UI 状态
@@ -87,7 +122,7 @@ Raycast 提供了三种不同的缓存机制，每种都适用于特定场景：
   - 存储用户偏好设置
   - UI 配置持久化
 
-### useCachedPromise (React Hook)
+#### useCachedPromise (React Hook)
 - **特点：**
   - 实现了 stale-while-revalidate 策略
   - 自动处理加载状态
@@ -99,11 +134,11 @@ Raycast 提供了三种不同的缓存机制，每种都适用于特定场景：
   - 优化数据加载体验
   - 列表数据缓存
 
-### 实现案例
+#### 实现案例
 
 以下是两个具体的使用案例，展示如何选择合适的缓存机制：
 
-#### 链接列表缓存
+##### 链接列表缓存
 - **使用场景：** 缓存所有短链接列表
 - **选用方案：** `useCachedPromise`
 - **原因：**
@@ -113,7 +148,7 @@ Raycast 提供了三种不同的缓存机制，每种都适用于特定场景：
   - 受益于 stale-while-revalidate 策略
   - 在显示缓存内容的同时保持数据新鲜度
 
-#### Slug 可用性验证
+##### Slug 可用性验证
 - **使用场景：** 缓存 slug 可用性检查结果
 - **选用方案：** `Cache` (底层 API)
 - **实现细节：**
