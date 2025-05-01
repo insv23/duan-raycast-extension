@@ -1,8 +1,8 @@
 export interface ValidationResult {
-	isValid: boolean;
-	message?: string;
+  isValid: boolean;
+  message?: string;
 }
 
 export interface UrlValidationRules {
-	format: (value: string | undefined) => ValidationResult;
+  format: (value: string | undefined) => ValidationResult;
 }

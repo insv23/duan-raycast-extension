@@ -5,5 +5,5 @@ import { fetchWithAuth } from "../client";
  * @returns Promise<string[]> shortcode 字符串数组
  */
 export const getShortcodes = async (): Promise<string[]> => {
-	return fetchWithAuth<string[]>("/api/shortcodes", { method: "GET" });
+  return fetchWithAuth<string[]>("/api/shortcodes", { method: "GET" });
 };

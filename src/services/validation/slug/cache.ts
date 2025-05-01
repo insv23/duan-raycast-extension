@@ -4,14 +4,14 @@ const CACHE_KEY = "duan-used-slugs";
 const slugCache = new Cache();
 
 export const getUsedSlugs = (): string[] => {
-	const cached = slugCache.get(CACHE_KEY);
-	return cached ? JSON.parse(cached) : [];
+  const cached = slugCache.get(CACHE_KEY);
+  return cached ? JSON.parse(cached) : [];
 };
 
 export const setUsedSlugs = (slugs: string[]) => {
-	slugCache.set(CACHE_KEY, JSON.stringify(slugs));
+  slugCache.set(CACHE_KEY, JSON.stringify(slugs));
 };
 
 export const isSlugUsed = (slug: string): boolean => {
-	return getUsedSlugs().includes(slug);
+  return getUsedSlugs().includes(slug);
 };

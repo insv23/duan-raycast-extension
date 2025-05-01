@@ -3,7 +3,7 @@ import type { Link } from "../types";
 /**
  * Search links by multiple fields (short_code, original_url, description)
  * Supports partial matching and case-insensitive search
- * 
+ *
  * @param links - Array of links to search through
  * @param searchText - Search query text
  * @returns Filtered array of links that match the search criteria
