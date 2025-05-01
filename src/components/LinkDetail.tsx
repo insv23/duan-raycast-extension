@@ -1,7 +1,6 @@
 import {
 	Action,
 	ActionPanel,
-	Detail,
 	Form,
 	showToast,
 	Toast,

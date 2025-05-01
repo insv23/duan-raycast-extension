@@ -1,4 +1,3 @@
-import { getLink } from "../../api";
 import type { ValidationResult, SlugValidationRules } from "./types";
 import { isSlugUsed } from "./cache";
 
