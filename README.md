@@ -26,9 +26,15 @@ URL shortener service based on Cloudflare Workers and D1 database.
 
 2. Install the Raycast extension from the Raycast Extension Store.
 
-3. Configure the extension with your API host and token.
+   Or manual installation:
+   ```bash
+   git clone https://github.com/insv23/duan-raycast-extension.git && cd duan-raycast-extension
+   npm install && npm run dev
+   ```
 
-4. Start using the extension to shorten and manage your links.
+4. Configure the extension with your API host and token.
+
+5. Start using the extension to shorten and manage your links.
 
 ## Development
 
