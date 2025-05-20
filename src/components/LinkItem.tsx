@@ -38,14 +38,12 @@ export const LinkItem = ({ link, onRefresh }: LinkItemProps) => {
     <List.Item
       icon={link.is_enabled ? undefined : Icon.EyeDisabled}
       title={link.short_code}
-      subtitle={link.original_url}
+      subtitle={`${link.description || ""}${link.description ? "  •  " : ""}${link.original_url}`}
       accessories={[
-        {
-          text: link.description || "",
-        },
         {
           text: link.visit_count.toString(),
           icon: Icon.Footprints,
+          tooltip: "Visit Count",
         },
       ]}
       actions={
