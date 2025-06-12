@@ -61,6 +61,9 @@ export default function Command() {
           description: values.description || null,
         });
 
+        toast.style = Toast.Style.Success;
+        toast.title = "Short link created";
+
         // Launch the list-links command
         await launchCommand({
           name: "list-links",
