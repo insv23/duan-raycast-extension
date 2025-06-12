@@ -26,6 +26,12 @@
 
 2. 从 Raycast 扩展商店安装此扩展。
 
+   或手动安装：
+   ```bash
+   git clone https://github.com/insv23/duan-raycast-extension.git && cd duan-raycast-extension
+   npm install && npm run dev
+   ```
+
 3. 使用你的 API 主机和令牌配置扩展。
 
 4. 开始使用扩展来缩短和管理你的链接。

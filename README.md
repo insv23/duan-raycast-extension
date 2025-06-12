@@ -32,9 +32,9 @@ URL shortener service based on Cloudflare Workers and D1 database.
    npm install && npm run dev
    ```
 
-4. Configure the extension with your API host and token.
+3. Configure the extension with your API host and token.
 
-5. Start using the extension to shorten and manage your links.
+4. Start using the extension to shorten and manage your links.
 
 ## Development
 
