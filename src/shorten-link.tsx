@@ -13,7 +13,7 @@ interface FormValues {
 }
 
 export default function Command() {
-  // 在 Shorten Link 命令加载时获取并缓存所有已使用的 slugs
+  // Fetch and cache all used slugs when the Shorten Link command loads
   useEffect(() => {
     const initializeSlugCache = async () => {
       const toast = await showToast({
@@ -61,7 +61,7 @@ export default function Command() {
           description: values.description || null,
         });
 
-        // 启动 list-links 命令
+        // Launch the list-links command
         await launchCommand({
           name: "list-links",
           type: LaunchType.UserInitiated,

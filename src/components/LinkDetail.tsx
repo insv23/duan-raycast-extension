@@ -40,19 +40,19 @@ export const LinkDetail = ({ link, onRefresh }: LinkDetailProps) => {
         toast.style = Toast.Style.Success;
         toast.title = "Link updated successfully";
 
-        onRefresh(); // 更新后重新获取 links list
-        pop(); // 更新成功后返回上一级
+        onRefresh(); // Refetch the links list after update
+        pop(); // Go back to the previous screen after successful update
       } catch (error) {
         toast.style = Toast.Style.Failure;
         toast.title = "Failed to update link";
         toast.message = error instanceof Error ? error.message : "Unknown error occurred";
       }
     },
-    // 使用传入的 link 对象的值作为表单的初始值
+    // Use the values from the incoming link object as the initial values for the form
     initialValues: {
-      url: link.original_url, // 使用原始 URL
-      is_enabled: link.is_enabled === 1, // 转换数字为布尔值
-      description: link.description || "", // 如果 description 为 null 则使用空字符串
+      url: link.original_url, // Use the original URL
+      is_enabled: link.is_enabled === 1, // Convert number to boolean
+      description: link.description || "", // Use an empty string if description is null
     },
   });
 

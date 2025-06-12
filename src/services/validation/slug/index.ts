@@ -2,13 +2,13 @@ import type { ValidationResult, SlugValidationRules } from "./types";
 import { isSlugUsed } from "./cache";
 
 /**
- * 函数签名：
- * value: string | undefined - 参数可以是字符串或 undefined
- * value is string - 这是类型谓词（type predicate），告诉 TypeScript 如果函数返回 true，那么 value 的类型就是 string
+ * Function Signature:
+ * value: string | undefined - The parameter can be a string or undefined.
+ * value is string - This is a type predicate. It tells TypeScript that if the function returns true, the type of `value` is `string`.
  *
- * 函数实现：
- * typeof value === 'string' - 首先检查 value 是否为字符串类型（排除 undefined）
- * value.length > 0 - 然后检查字符串是否非空
+ * Function Implementation:
+ * typeof value === 'string' - First, it checks if `value` is a string type (excluding undefined).
+ * value.length > 0 - Then, it checks if the string is not empty.
  */
 function isNonEmptyString(value: string | undefined): value is string {
   return typeof value === "string" && value.length > 0;
@@ -22,7 +22,7 @@ export const validateSlugFormat = (value: string | undefined): ValidationResult 
     };
   }
 
-  // 检查格式是否符合要求
+  // Check if the format is valid
   if (!value.match(/^[a-zA-Z0-9-_]+$/)) {
     return {
       isValid: false,
@@ -30,9 +30,9 @@ export const validateSlugFormat = (value: string | undefined): ValidationResult 
     };
   }
 
-  // 添加缓存验证
-  // 1. 在 shorten-link 命令加载时获取 slugs 并更新到 Cache
-  // 2. 在表单验证时同步地从 Cache 读取进行验证(因为 Raycast 的表单验证不支持异步)
+  // Add cache validation
+  // 1. Fetch slugs and update the Cache when the shorten-link command loads.
+  // 2. Synchronously read from the Cache for validation during form validation (because Raycast's form validation doesn't support async).
   if (isSlugUsed(value)) {
     return {
       isValid: false,
