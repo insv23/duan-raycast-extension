@@ -1,5 +1,5 @@
 import { Action, ActionPanel, Form, showToast, Toast, useNavigation } from "@raycast/api";
-import { useForm } from "@raycast/utils";
+import { useForm, showFailureToast } from "@raycast/utils";
 import type { Link } from "../types";
 import { updateLink } from "../services/api";
 import { urlValidation } from "../services/validation";
@@ -43,9 +43,7 @@ export const LinkDetail = ({ link, onRefresh }: LinkDetailProps) => {
         onRefresh(); // Refetch the links list after update
         pop(); // Go back to the previous screen after successful update
       } catch (error) {
-        toast.style = Toast.Style.Failure;
-        toast.title = "Failed to update link";
-        toast.message = error instanceof Error ? error.message : "Unknown error occurred";
+        await showFailureToast(error, { title: "Failed to update link" });
       }
     },
     // Use the values from the incoming link object as the initial values for the form
