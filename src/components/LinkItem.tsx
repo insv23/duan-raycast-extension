@@ -34,22 +34,25 @@ export const LinkItem = ({ link, onRefresh }: LinkItemProps) => {
     }
   };
 
+  const accessories: List.Item.Accessory[] = [];
+  if (link.description) {
+    accessories.push({
+      tag: { value: link.description, color: Color.Blue },
+      tooltip: "Description",
+    });
+  }
+  accessories.push({
+    tag: { value: link.visit_count.toString(), color: Color.Green },
+    icon: Icon.Footprints,
+    tooltip: "Visit Count",
+  });
+
   return (
     <List.Item
       icon={link.is_enabled ? undefined : Icon.EyeDisabled}
       title={link.short_code}
       subtitle={link.original_url}
-      accessories={[
-        {
-          tag: { value: link.description || "", color: Color.Blue },
-          tooltip: "Description",
-        },
-        {
-          tag: { value: link.visit_count.toString(), color: Color.Green },
-          icon: Icon.Footprints,
-          tooltip: "Visit Count",
-        },
-      ]}
+      accessories={accessories}
       actions={
         <ActionPanel>
           <Action.CopyToClipboard icon={Icon.Clipboard} title="Copy Short Link" content={shortUrl} />
