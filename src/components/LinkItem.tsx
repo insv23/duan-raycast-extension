@@ -55,7 +55,12 @@ export const LinkItem = ({ link, onRefresh }: LinkItemProps) => {
       actions={
         <ActionPanel>
           <Action.CopyToClipboard icon={Icon.Clipboard} title="Copy Short Link" content={shortUrl} />
-          <Action.Push icon={Icon.Paragraph} title="Edit" target={<LinkDetail link={link} onRefresh={onRefresh} />} />
+          <Action.Push
+            icon={Icon.Pencil}
+            title="Edit"
+            shortcut={Keyboard.Shortcut.Common.Edit}
+            target={<LinkDetail link={link} onRefresh={onRefresh} />}
+          />
           <Action
             icon={Icon.Trash}
             title="Delete Link"
