@@ -5,7 +5,8 @@ import { LinkItem } from "./components/LinkItem";
 import { searchLinks } from "./services/search";
 import { sortLinks, getSortLabel, isValidSortOption } from "./services/sort";
 import { filterLinks, getFilterLabel } from "./services/filter";
-import type { SortOption, FilterOption } from "./types";
+import { cleanupPinnedSlugs, pinLink, unpinLink, movePinnedLink } from "./services/pin";
+import type { SortOption, FilterOption, Link } from "./types";
 
 interface LaunchProps {
   launchContext?: {
@@ -19,6 +20,8 @@ export default function Command(props: LaunchProps) {
   const [sortBy, setSortBy] = useState<SortOption>("created_desc");
   const [isLoadingSort, setIsLoadingSort] = useState(true);
   const [filterBy, setFilterBy] = useState<FilterOption>("all");
+  const [pinnedSlugs, setPinnedSlugs] = useState<string[]>([]);
+  const [isLoadingPinned, setIsLoadingPinned] = useState(true);
 
   // Load saved sort preference
   useEffect(() => {
@@ -30,25 +33,91 @@ export default function Command(props: LaunchProps) {
     });
   }, []);
 
+  // Load and cleanup pinned slugs
+  useEffect(() => {
+    if (!links) return;
+
+    const loadPinned = async () => {
+      const existingSlugs = links.map((link) => link.short_code);
+      const validPinned = await cleanupPinnedSlugs(existingSlugs);
+      setPinnedSlugs(validPinned);
+      setIsLoadingPinned(false);
+    };
+
+    loadPinned();
+  }, [links]);
+
   // Save sort preference
   const handleSortChange = async (newSort: SortOption) => {
     setSortBy(newSort);
     await LocalStorage.setItem("link-sort-preference", newSort);
   };
 
-  // Data processing pipeline: filter → sort → search
-  const processedLinks = useMemo(() => {
-    if (!links) return [];
+  // Pin handlers
+  const handlePin = async (slug: string) => {
+    await pinLink(slug);
+    setPinnedSlugs([...pinnedSlugs, slug]);
+  };
 
-    // Step 1: Apply filter
-    const filtered = filterLinks(links, filterBy);
+  const handleUnpin = async (slug: string) => {
+    await unpinLink(slug);
+    setPinnedSlugs(pinnedSlugs.filter((s) => s !== slug));
+  };
 
-    // Step 2: Apply sorting
-    const sorted = sortLinks(filtered, sortBy);
+  const handleMoveUp = async (slug: string) => {
+    const success = await movePinnedLink(slug, "up");
+    if (success) {
+      const index = pinnedSlugs.indexOf(slug);
+      const newPinned = [...pinnedSlugs];
+      [newPinned[index], newPinned[index - 1]] = [newPinned[index - 1], newPinned[index]];
+      setPinnedSlugs(newPinned);
+    }
+  };
 
-    // Step 3: Apply search
-    return searchLinks(sorted, keyword);
-  }, [links, filterBy, sortBy, keyword]);
+  const handleMoveDown = async (slug: string) => {
+    const success = await movePinnedLink(slug, "down");
+    if (success) {
+      const index = pinnedSlugs.indexOf(slug);
+      const newPinned = [...pinnedSlugs];
+      [newPinned[index], newPinned[index + 1]] = [newPinned[index + 1], newPinned[index]];
+      setPinnedSlugs(newPinned);
+    }
+  };
+
+  // Data processing pipeline
+  const { pinnedLinks, unpinnedLinks } = useMemo(() => {
+    if (!links) return { pinnedLinks: [], unpinnedLinks: [] };
+
+    // Separate pinned and unpinned
+    const pinned: Link[] = [];
+    const unpinned: Link[] = [];
+
+    // Maintain pinned order
+    for (const slug of pinnedSlugs) {
+      const link = links.find((l) => l.short_code === slug);
+      if (link) pinned.push(link);
+    }
+
+    // Collect unpinned
+    for (const link of links) {
+      if (!pinnedSlugs.includes(link.short_code)) {
+        unpinned.push(link);
+      }
+    }
+
+    // Process unpinned: filter → sort
+    const filteredUnpinned = filterLinks(unpinned, filterBy);
+    const sortedUnpinned = sortLinks(filteredUnpinned, sortBy);
+
+    return {
+      pinnedLinks: pinned,
+      unpinnedLinks: sortedUnpinned,
+    };
+  }, [links, pinnedSlugs, filterBy, sortBy]);
+
+  // Apply search to all links
+  const searchedPinned = searchLinks(pinnedLinks, keyword);
+  const searchedUnpinned = searchLinks(unpinnedLinks, keyword);
 
   return (
     <List
@@ -65,23 +134,45 @@ export default function Command(props: LaunchProps) {
           <List.Dropdown.Item title="Disabled Links" value="disabled" icon={Icon.XMarkCircle} />
         </List.Dropdown>
       }
-      isLoading={isLoading || isLoadingSort}
+      isLoading={isLoading || isLoadingSort || isLoadingPinned}
       onSearchTextChange={setKeyword}
       searchText={keyword}
       filtering={false} // Disable Raycast's built-in filtering
       throttle // Optimize performance with throttling
     >
+      {searchedPinned.length > 0 && (
+        <List.Section title={`Pinned Links (${searchedPinned.length})`}>
+          {searchedPinned.map((link, index) => (
+            <LinkItem
+              key={link.short_code}
+              link={link}
+              onRefresh={revalidate}
+              currentSort={sortBy}
+              onSortChange={handleSortChange}
+              isPinned={true}
+              onPin={handlePin}
+              onUnpin={handleUnpin}
+              onMoveUp={index > 0 ? () => handleMoveUp(link.short_code) : undefined}
+              onMoveDown={index < pinnedLinks.length - 1 ? () => handleMoveDown(link.short_code) : undefined}
+            />
+          ))}
+        </List.Section>
+      )}
+
       <List.Section
-        title={`${processedLinks.length} ${getFilterLabel(filterBy).toLowerCase()} links`}
+        title={`${getFilterLabel(filterBy)} Links (${searchedUnpinned.length})`}
         subtitle={!isLoadingSort ? getSortLabel(sortBy) : undefined}
       >
-        {processedLinks.map((link) => (
+        {searchedUnpinned.map((link) => (
           <LinkItem
             key={link.short_code}
             link={link}
             onRefresh={revalidate}
             currentSort={sortBy}
             onSortChange={handleSortChange}
+            isPinned={false}
+            onPin={handlePin}
+            onUnpin={handleUnpin}
           />
         ))}
       </List.Section>

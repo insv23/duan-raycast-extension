@@ -9,9 +9,24 @@ interface LinkItemProps {
   onRefresh: () => void;
   currentSort?: SortOption;
   onSortChange?: (sort: SortOption) => void;
+  isPinned?: boolean;
+  onPin?: (slug: string) => void;
+  onUnpin?: (slug: string) => void;
+  onMoveUp?: () => void;
+  onMoveDown?: () => void;
 }
 
-export const LinkItem = ({ link, onRefresh, currentSort, onSortChange }: LinkItemProps) => {
+export const LinkItem = ({
+  link,
+  onRefresh,
+  currentSort,
+  onSortChange,
+  isPinned = false,
+  onPin,
+  onUnpin,
+  onMoveUp,
+  onMoveDown,
+}: LinkItemProps) => {
   const BASE_URL = getPreferenceValues<Preferences>().host;
   const shortUrl = `${BASE_URL}/${link.short_code}`;
 
@@ -71,6 +86,42 @@ export const LinkItem = ({ link, onRefresh, currentSort, onSortChange }: LinkIte
               shortcut={Keyboard.Shortcut.Common.Remove}
               onAction={handleDelete}
             />
+          </ActionPanel.Section>
+
+          <ActionPanel.Section>
+            {isPinned ? (
+              <>
+                <Action
+                  icon={Icon.Pin}
+                  title="Unpin"
+                  shortcut={Keyboard.Shortcut.Common.Pin}
+                  onAction={() => onUnpin?.(link.short_code)}
+                />
+                {onMoveUp && (
+                  <Action
+                    icon={Icon.ArrowUp}
+                    title="Move up"
+                    shortcut={Keyboard.Shortcut.Common.MoveUp}
+                    onAction={onMoveUp}
+                  />
+                )}
+                {onMoveDown && (
+                  <Action
+                    icon={Icon.ArrowDown}
+                    title="Move Down"
+                    shortcut={Keyboard.Shortcut.Common.MoveDown}
+                    onAction={onMoveDown}
+                  />
+                )}
+              </>
+            ) : (
+              <Action
+                icon={Icon.Pin}
+                title="Pin"
+                shortcut={Keyboard.Shortcut.Common.Pin}
+                onAction={() => onPin?.(link.short_code)}
+              />
+            )}
           </ActionPanel.Section>
 
           {onSortChange && (
