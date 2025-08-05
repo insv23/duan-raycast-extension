@@ -1,10 +1,11 @@
-import { List, LocalStorage } from "@raycast/api";
+import { List, LocalStorage, Icon } from "@raycast/api";
 import { useState, useEffect, useMemo } from "react";
 import { useLinks } from "./hooks/useLinks";
 import { LinkItem } from "./components/LinkItem";
 import { searchLinks } from "./services/search";
 import { sortLinks, getSortLabel, isValidSortOption } from "./services/sort";
-import type { SortOption } from "./types";
+import { filterLinks, getFilterLabel } from "./services/filter";
+import type { SortOption, FilterOption } from "./types";
 
 interface LaunchProps {
   launchContext?: {
@@ -17,6 +18,7 @@ export default function Command(props: LaunchProps) {
   const [keyword, setKeyword] = useState(props.launchContext?.searchText || "");
   const [sortBy, setSortBy] = useState<SortOption>("created_desc");
   const [isLoadingSort, setIsLoadingSort] = useState(true);
+  const [filterBy, setFilterBy] = useState<FilterOption>("all");
 
   // Load saved sort preference
   useEffect(() => {
@@ -34,19 +36,35 @@ export default function Command(props: LaunchProps) {
     await LocalStorage.setItem("link-sort-preference", newSort);
   };
 
-  // Apply sorting
-  const sortedLinks = useMemo(() => {
+  // Data processing pipeline: filter → sort → search
+  const processedLinks = useMemo(() => {
     if (!links) return [];
-    return sortLinks(links, sortBy);
-  }, [links, sortBy]);
 
-  // Apply search filter
-  const filteredLinks = searchLinks(sortedLinks, keyword);
+    // Step 1: Apply filter
+    const filtered = filterLinks(links, filterBy);
+
+    // Step 2: Apply sorting
+    const sorted = sortLinks(filtered, sortBy);
+
+    // Step 3: Apply search
+    return searchLinks(sorted, keyword);
+  }, [links, filterBy, sortBy, keyword]);
 
   return (
     <List
-      navigationTitle={!isLoadingSort ? `Links - ${getSortLabel(sortBy)}` : "Links"}
+      navigationTitle={!isLoadingSort ? `Links - ${getFilterLabel(filterBy)} - ${getSortLabel(sortBy)}` : "Links"}
       searchBarPlaceholder="Search by Slug, URL or Description"
+      searchBarAccessory={
+        <List.Dropdown
+          tooltip="Filter Links"
+          storeValue={true}
+          onChange={(newValue) => setFilterBy(newValue as FilterOption)}
+        >
+          <List.Dropdown.Item title="All Links" value="all" icon={Icon.Circle} />
+          <List.Dropdown.Item title="Active Links" value="active" icon={Icon.CheckCircle} />
+          <List.Dropdown.Item title="Disabled Links" value="disabled" icon={Icon.XMarkCircle} />
+        </List.Dropdown>
+      }
       isLoading={isLoading || isLoadingSort}
       onSearchTextChange={setKeyword}
       searchText={keyword}
@@ -54,10 +72,10 @@ export default function Command(props: LaunchProps) {
       throttle // Optimize performance with throttling
     >
       <List.Section
-        title={`${filteredLinks.length} links`}
+        title={`${processedLinks.length} ${getFilterLabel(filterBy).toLowerCase()} links`}
         subtitle={!isLoadingSort ? getSortLabel(sortBy) : undefined}
       >
-        {filteredLinks.map((link) => (
+        {processedLinks.map((link) => (
           <LinkItem
             key={link.short_code}
             link={link}

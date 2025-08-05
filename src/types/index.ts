@@ -15,3 +15,5 @@ export type SortOption =
   | "visited_asc" // Least recently visited
   | "visits_desc" // Most visited
   | "visits_asc"; // Least visited
+
+export type FilterOption = "all" | "active" | "disabled";
